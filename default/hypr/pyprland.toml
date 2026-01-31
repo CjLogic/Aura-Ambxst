@@ -1,0 +1,7 @@
+[pyprland]
+include = [
+    "~/.config/hypr/pyprland.d",
+]
+plugins = [
+  "scratchpads",
+]

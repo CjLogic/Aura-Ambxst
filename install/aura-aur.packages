@@ -1,0 +1,28 @@
+# AUR packages built during ISO creation and installed from offline repository
+# These are NOT available in official Arch repos, must be built from AUR
+
+# === Aura Shell AUR Deps ===
+quickshell-git
+app2unit
+libcava
+ttf-rubik-vf
+
+# === Aura CLI AUR Deps ===
+xdg-terminal-exec
+gpu-screen-recorder
+
+# === Qt/Display AUR Deps ===
+qt5ct-kde
+qt6ct-kde
+google-breakpad
+qqc2-desktop-style5
+
+# === Applications (AUR) ===
+localsend
+appimagelauncher
+todoist-appimage
+brave-bin
+#helium-browser-bin
+i2c-tools
+ufw-docker
+python-materialyoucolor

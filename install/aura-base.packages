@@ -1,0 +1,185 @@
+# Aura core package list - dev tools + Aura essentials
+# This file is used by the ISO builder when determining needs
+
+# === Shell & Terminal ===
+fish
+# foot
+kitty
+ghostty
+stow
+bash-completion
+bash
+curl
+wget
+
+# === System utilities ===
+htop
+bat
+btop
+dust
+fd
+fzf
+gum
+less
+man-db
+plocate
+ripgrep
+tldr
+tree-sitter-cli
+unzip
+whois
+inxi
+usage
+xmlstarlet
+bluetui
+cups
+cups-browsed
+cups-filters
+cups-pdf
+
+# === Dev Tools - Version Managers ===
+mise
+
+# === Dev Tools - Containers ===
+docker
+docker-buildx
+docker-compose
+lazydocker
+
+# === Dev Tools - Git ===
+lazygit
+github-cli
+
+# === Dev Tools - Languages ===
+ruby
+rustup
+clang
+llvm
+luarocks
+
+# === AI Dev Tools  ===
+opencode
+
+# === Dev Tools - Databases ===
+postgresql-libs
+mariadb-libs
+
+# === Dev Tools - Editors ===
+micro
+gimp
+obsidian
+
+# === Hyprland Desktop Environment ===
+hyprland
+hyprland-guiutils
+hyprland-preview-share-picker
+hypridle
+hyprlock
+hyprsunset
+waybar
+swaybg
+swayosd
+mako
+wofi
+grim
+slurp
+satty
+imagemagick
+omarchy-walker
+
+# === Aura OS Deps ===
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
+xdg-terminal-exec
+hyprpicker
+starship
+wireplumber
+nautilus
+hyprpolkitagent
+fastfetch
+jq
+eza
+ttf-jetbrains-mono-nerd
+pavucontrol
+wl-clipboard
+wiremix
+kvantum-qt5
+
+# === Audio ===
+pamixer
+playerctl
+
+# === Networking ===
+iwd
+avahi
+nss-mdns
+
+# === System Services ===
+dbus
+polkit-gnome
+gnome-keyring
+libsecret
+power-profiles-daemon
+uwsm
+
+# === Fonts ===
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+noto-fonts-extra
+ttf-cascadia-code-nerd
+ttf-cascadia-mono-nerd
+ttf-jetbrains-mono-nerd
+ttf-material-symbols-variable
+woff2-font-awesome
+fontconfig
+
+# === File Management ===
+gvfs-mtp
+gvfs-nfs
+gvfs-smb
+gnome-disk-utility
+exfatprogs
+ffmpegthumbnailer
+yazi
+ffmpeg
+7zip
+poppler
+ripgrep
+zoxide
+resvg
+imagemagick
+tobi-try
+
+# === Security ===
+ufw
+ufw-docker
+
+# === Boot & System ===
+plymouth
+brightnessctl
+tzupdate
+wireless-regdb
+python-gobject
+python-poetry-core
+python-terminaltexteffects
+python-pip
+
+# === Aura Favs ===
+discover
+direnv
+flatpak
+yay
+pinta
+
+# === System Libraries ===
+libyaml
+bolt
+expac
+
+# === Display Manager ===
+sddm
+
+
+# === Backup & Snapshots ===
+timeshift

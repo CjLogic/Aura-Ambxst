@@ -1,0 +1,7 @@
+# Editor used by CLI
+export SUDO_EDITOR="$EDITOR"
+export BAT_THEME=ansi
+
+# Aura paths
+export AURA_PATH="$HOME/.local/share/aura"
+export PATH="$AURA_PATH/bin:$PATH"
