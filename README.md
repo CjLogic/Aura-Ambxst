@@ -61,6 +61,24 @@ Originally forked from Omarchy, Aura has been completely revamped to balance hig
 4. Reboot after installation completes
 5. Login and you'll be greeted with the Aura Hyprland desktop
 
+## Verifying ISO Authenticity
+
+To verify your downloaded ISO is genuine and unmodified:
+
+1. Download the public key:
+
+- Import your public key from keyserver
+gpg --keyserver keyserver.ubuntu.com --recv-keys 42E31974FF72C21F
+
+- Download ISO and signature
+curl -O <https://aura.cortexnest.icu/aura-2026.01.31-x86_64-master.iso>
+curl -O <https://aura.cortexnest.icu/aura-2026.01.31-x86_64-master.iso.sig>
+
+- Verify
+gpg --verify aura-2026.01.31-x86_64-master.iso.sig aura-2026.01.31-x86_64-master.iso
+
+You should see "Good signature from AuraOS Release <studio@onpointwebstudio.com>"
+
 For build instructions, see the [aura-iso repository](https://github.com/CjLogic/aura-iso).
 
 ## First Boot
@@ -131,6 +149,7 @@ Contributions are welcome:
 Aura is released under the [MIT License](https://opensource.org/licenses/MIT).
 
 This project incorporates components from:
+
 - Arch Linux (GPL)
 - Ambxst (see [Ambxst repository](https://github.com/Axenide/Ambxst) for license details)
 
