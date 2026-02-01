@@ -47,8 +47,13 @@ if [ -n "$(lspci | grep -i 'nvidia')" ]; then
   sudo pacman -S --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
 
   # Configure modprobe for early KMS
+  # Note: ASUS-specific config will override this if needed (nvidia-asus.conf takes precedence)
   echo "Configuring modprobe..."
-  echo "options nvidia_drm modeset=1 fbdev=1" | sudo tee /etc/modprobe.d/nvidia.conf >/dev/null
+  if [[ ! -f /etc/modprobe.d/nvidia-asus.conf ]]; then
+    echo "options nvidia_drm modeset=1 fbdev=1" | sudo tee /etc/modprobe.d/nvidia.conf >/dev/null
+  else
+    echo "Skipping nvidia.conf (nvidia-asus.conf exists)"
+  fi
 
   # Configure mkinitcpio for early loading
   MKINITCPIO_CONF="/etc/mkinitcpio.conf"

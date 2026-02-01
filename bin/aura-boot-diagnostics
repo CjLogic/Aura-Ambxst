@@ -1,0 +1,209 @@
+#!/bin/bash
+
+# Aura Boot Diagnostics Tool
+# Helps troubleshoot bootloader issues, especially on ASUS/AMI firmware
+
+echo "======================================"
+echo "   Aura Boot Diagnostics Tool"
+echo "======================================"
+echo
+
+# Detect if running in EFI mode
+if [[ -d /sys/firmware/efi ]]; then
+  echo "✓ System booted in EFI mode"
+  EFI=true
+else
+  echo "✗ System NOT in EFI mode (Legacy/BIOS boot)"
+  EFI=false
+fi
+echo
+
+# Hardware Detection
+echo "--- Hardware Information ---"
+BIOS_VENDOR=$(cat /sys/class/dmi/id/bios_vendor 2>/dev/null || echo "Unknown")
+BIOS_VERSION=$(cat /sys/class/dmi/id/bios_version 2>/dev/null || echo "Unknown")
+SYS_VENDOR=$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null || echo "Unknown")
+SYS_MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown")
+
+echo "BIOS Vendor:   $BIOS_VENDOR"
+echo "BIOS Version:  $BIOS_VERSION"
+echo "System Vendor: $SYS_VENDOR"
+echo "System Model:  $SYS_MODEL"
+
+IS_AMI=false
+IS_ASUS=false
+
+if echo "$BIOS_VENDOR" | grep -qi "American Megatrends"; then
+  IS_AMI=true
+  echo "⚠ American Megatrends (AMI) firmware detected"
+  echo "  Note: AMI firmware may have NVRAM persistence issues"
+fi
+
+if echo "$SYS_VENDOR" | grep -qi "ASUSTeK"; then
+  IS_ASUS=true
+  echo "⚠ ASUS hardware detected"
+  echo "  Note: ASUS firmware often prefers fallback bootloader"
+fi
+echo
+
+if [[ "$EFI" == "true" ]]; then
+  # ESP Information
+  echo "--- ESP (EFI System Partition) Information ---"
+  BOOT_SOURCE=$(findmnt -n -o SOURCE /boot 2>/dev/null)
+
+  if [[ -n "$BOOT_SOURCE" ]]; then
+    echo "ESP mounted at: /boot"
+    echo "ESP device: $BOOT_SOURCE"
+
+    BOOT_DEVICE=$(echo "$BOOT_SOURCE" | sed 's/p\?[0-9]*$//')
+    BOOT_PART_NUM=$(echo "$BOOT_SOURCE" | grep -o '[0-9]*$')
+
+    echo "Disk: $BOOT_DEVICE"
+    echo "Partition: $BOOT_PART_NUM"
+
+    # Check partition flags
+    if command -v parted &>/dev/null; then
+      echo
+      echo "Partition flags:"
+      sudo parted "$BOOT_DEVICE" print 2>/dev/null | grep "^ *$BOOT_PART_NUM " || echo "Could not read partition info"
+    fi
+  else
+    echo "✗ ESP not mounted at /boot"
+  fi
+  echo
+
+  # ESP Directory Structure
+  echo "--- ESP Directory Structure ---"
+  if [[ -d /boot/EFI ]]; then
+    echo "EFI directories found:"
+    ls -la /boot/EFI/ 2>/dev/null | grep "^d" | awk '{print $NF}' | grep -v "^\.$\|^\.\.$"
+
+    # Check for fallback bootloader
+    if [[ -f /boot/EFI/BOOT/BOOTX64.EFI ]]; then
+      echo "✓ Fallback bootloader exists: /boot/EFI/BOOT/BOOTX64.EFI"
+      FALLBACK_SIZE=$(stat -c%s /boot/EFI/BOOT/BOOTX64.EFI 2>/dev/null)
+      echo "  Size: $FALLBACK_SIZE bytes"
+    else
+      echo "✗ Fallback bootloader MISSING: /boot/EFI/BOOT/BOOTX64.EFI"
+      echo "  ⚠ This is critical for ASUS/AMI firmware compatibility!"
+    fi
+
+    # Check for UKI
+    if [[ -d /boot/EFI/Linux ]]; then
+      UKI_FILES=$(find /boot/EFI/Linux/ -name "*.efi" 2>/dev/null)
+      if [[ -n "$UKI_FILES" ]]; then
+        echo "✓ UKI images found in /boot/EFI/Linux/:"
+        echo "$UKI_FILES" | while read -r uki; do
+          UKI_NAME=$(basename "$uki")
+          UKI_SIZE=$(stat -c%s "$uki" 2>/dev/null)
+          echo "  - $UKI_NAME ($UKI_SIZE bytes)"
+        done
+      else
+        echo "✗ No UKI images found in /boot/EFI/Linux/"
+      fi
+    else
+      echo "✗ /boot/EFI/Linux/ directory not found"
+    fi
+  else
+    echo "✗ /boot/EFI directory not found"
+  fi
+  echo
+
+  # Limine Configuration
+  echo "--- Limine Configuration ---"
+  if [[ -f /etc/default/limine ]]; then
+    echo "Limine configuration (/etc/default/limine):"
+    grep -E "^(ENABLE_UKI|ENABLE_LIMINE_FALLBACK|CUSTOM_UKI_NAME|TARGET_OS_NAME)" /etc/default/limine 2>/dev/null || echo "No relevant settings found"
+  else
+    echo "✗ /etc/default/limine not found"
+  fi
+  echo
+
+  if [[ -f /boot/limine.conf ]]; then
+    echo "✓ /boot/limine.conf exists"
+    TIMEOUT=$(grep "^timeout:" /boot/limine.conf 2>/dev/null | head -1)
+    if [[ -n "$TIMEOUT" ]]; then
+      echo "  $TIMEOUT"
+    else
+      echo "  ⚠ No timeout setting found"
+    fi
+  else
+    echo "✗ /boot/limine.conf not found"
+  fi
+  echo
+
+  # EFI Boot Manager
+  echo "--- EFI Boot Manager (efibootmgr) ---"
+  if command -v efibootmgr &>/dev/null; then
+    echo "Current boot entries:"
+    efibootmgr 2>/dev/null || echo "✗ Failed to read EFI variables"
+    echo
+
+    # Check for Aura entry
+    if efibootmgr 2>/dev/null | grep -qi "Aura"; then
+      echo "✓ Aura boot entry found in NVRAM"
+      AURA_BOOTNUM=$(efibootmgr | grep -i "Aura" | sed 's/^Boot\([0-9]\{4\}\).*/\1/' | head -1)
+      echo "  Boot number: $AURA_BOOTNUM"
+
+      # Check if it's in boot order
+      BOOT_ORDER=$(efibootmgr | grep "BootOrder:" | sed 's/BootOrder: //')
+      if echo "$BOOT_ORDER" | grep -q "$AURA_BOOTNUM"; then
+        echo "  ✓ Present in boot order"
+        BOOT_ORDER_POS=$(echo "$BOOT_ORDER" | tr ',' '\n' | grep -n "^$AURA_BOOTNUM$" | cut -d: -f1)
+        echo "  Position: $BOOT_ORDER_POS"
+      else
+        echo "  ✗ NOT in boot order"
+      fi
+    else
+      echo "✗ No Aura boot entry in NVRAM"
+      if [[ "$IS_ASUS" == "true" ]] || [[ "$IS_AMI" == "true" ]]; then
+        echo "  Note: ASUS/AMI firmware may not preserve custom entries"
+        echo "  Fallback bootloader should be used instead"
+      fi
+    fi
+  else
+    echo "✗ efibootmgr command not found"
+  fi
+  echo
+
+  # Recommendations
+  echo "======================================"
+  echo "   Recommendations"
+  echo "======================================"
+
+  HAS_ISSUES=false
+
+  if [[ ! -f /boot/EFI/BOOT/BOOTX64.EFI ]]; then
+    echo "⚠ CRITICAL: Fallback bootloader missing"
+    echo "  Fix: Run 'sudo limine-update' to regenerate"
+    HAS_ISSUES=true
+  fi
+
+  if ! efibootmgr 2>/dev/null | grep -qi "Aura"; then
+    if [[ "$IS_ASUS" != "true" ]] && [[ "$IS_AMI" != "true" ]]; then
+      echo "⚠ No Aura NVRAM entry found"
+      echo "  Fix: Run 'sudo aura-refresh-limine' or manually create entry with efibootmgr"
+      HAS_ISSUES=true
+    fi
+  fi
+
+  if [[ "$IS_ASUS" == "true" ]] || [[ "$IS_AMI" == "true" ]]; then
+    echo "ℹ ASUS/AMI firmware detected"
+    echo "  - Ensure fallback bootloader exists (critical)"
+    echo "  - NVRAM entries may not persist (this is normal)"
+    echo "  - Disable Secure Boot if experiencing issues"
+    echo "  - Set boot mode to UEFI (not Legacy/CSM) in BIOS"
+  fi
+
+  if [[ "$HAS_ISSUES" == "false" ]]; then
+    echo "✓ No critical issues detected"
+  fi
+else
+  echo "System is not running in EFI mode."
+  echo "This tool is designed for UEFI systems."
+fi
+
+echo
+echo "======================================"
+echo "For more help, see: https://github.com/CjLogic/Aura"
+echo "======================================"

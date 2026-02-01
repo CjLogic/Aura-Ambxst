@@ -10,6 +10,8 @@ Originally forked from Omarchy, Aura has been completely revamped to balance hig
 
 ## System Requirements
 
+if you have  Asus Hardware check this out [Asus Compatibility Guide](asus-compatibility.md)
+
 - **RAM**: 2GB minimum (4GB recommended)
 - **Disk Space**: 20GB minimum
 - **CPU**: x86_64 processor
