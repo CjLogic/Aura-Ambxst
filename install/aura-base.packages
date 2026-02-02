@@ -11,6 +11,7 @@ bash-completion
 bash
 curl
 wget
+git
 
 # === System utilities ===
 htop
@@ -52,7 +53,7 @@ github-cli
 
 # === Dev Tools - Languages ===
 ruby
-rustup
+rust
 clang
 llvm
 luarocks
