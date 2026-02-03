@@ -35,6 +35,8 @@ if status is-interactive
     # Custom colours
     cat ~/.local/state/aura/sequences.txt 2> /dev/null
 
+    set -gx primary (jq -r '.primary' ~/.local/share/Ambxst/colors.json 2>/dev/null | string replace '#' '')
+
     # For jumping between prompts in foot terminal
     function mark_prompt_start --on-event fish_prompt
         echo -en "\e]133;A\e\\"
