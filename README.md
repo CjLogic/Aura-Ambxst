@@ -10,7 +10,12 @@ support for more shells like [Caelestia](https://github.com/caelestia-dots/caele
 Originally forked from [Omarchy](https://github.com/basecamp/omarchy), Aura has been completely revamped to balance high-performance workflow capabilities with the striking aesthetics of the Ambxst setup. This distribution provides a resilient, out-of-the-box system that pairs deep utility with refined visual design.
 
 
-## Download ISO [HERE](https://logixhub.icu/projects/aura/)
+## Ways To download and install
+Download ISO [HERE](https://logixhub.icu/projects/aura/)
+ 
+or
+
+Install with `curl -fsSL https://raw.githubusercontent.com/CjLogic/Aura-Ambxst/master/install.sh | bash `
 
 
 ## What is Ambxst?
