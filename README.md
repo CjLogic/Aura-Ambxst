@@ -9,6 +9,10 @@ support for more shells like [Caelestia](https://github.com/caelestia-dots/caele
 
 Originally forked from [Omarchy](https://github.com/basecamp/omarchy), Aura has been completely revamped to balance high-performance workflow capabilities with the striking aesthetics of the Ambxst setup. This distribution provides a resilient, out-of-the-box system that pairs deep utility with refined visual design.
 
+
+## Download ISO [HERE](https://logixhub.icu/projects/aura/)
+
+
 ## What is Ambxst?
 
 [Ambxst](https://github.com/Axenide/Ambxst) is a Quickshell-based desktop environment that provides a modern, customizable interface with launcher, status bar, and notification components. Aura ships with a base Hyprland configuration and includes an automated first-boot script to install Ambxst (which requires AUR dependencies).
